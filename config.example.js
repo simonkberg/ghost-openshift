@@ -4,6 +4,11 @@
 var path = require('path'),
     config;
 
+// Setup environment variables.
+var ipaddr  = process.env.OPENSHIFT_INTERNAL_IP   || process.env.OPENSHIFT_NODEJS_IP   || "127.0.0.1";
+var port    = process.env.OPENSHIFT_INTERNAL_PORT || process.env.OPENSHIFT_NODEJS_PORT || 2368;
+var dbdir   = process.env.OPENSHIFT_DATA_DIR;
+
 config = {
     // ### Development **(default)**
     development: {
@@ -29,13 +34,13 @@ config = {
         database: {
             client: 'sqlite3',
             connection: {
-                filename: path.join(__dirname, '/content/data/ghost-dev.db')
+                filename: path.join(dbdir, '/ghost-dev.db')
             },
             debug: false
         },
         server: {
-            host: '127.0.0.1',
-            port: '2368'
+            host: ipaddr,
+            port: port
         }
     },
 
@@ -48,13 +53,13 @@ config = {
         database: {
             client: 'sqlite3',
             connection: {
-                filename: path.join(__dirname, '/content/data/ghost.db')
+                filename: path.join(dbdir, '/ghost.db')
             },
             debug: false
         },
         server: {
-            host: '127.0.0.1',
-            port: '2368'
+            host: ipaddr,
+            port: port
         }
     },
 
