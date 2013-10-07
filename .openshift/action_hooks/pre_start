@@ -1,4 +1,3 @@
 #!/bin/bash
-# Uncomment lines below to change default execution environment
-#echo "export NODE_ENV=\"production\"" > ${OPENSHIFT_DATA_DIR}/.myenv
-#source ${OPENSHIFT_DATA_DIR}/.myenv
+# Change execution environment here
+export NODE_ENV="production"
