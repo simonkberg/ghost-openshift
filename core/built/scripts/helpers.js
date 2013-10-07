@@ -1,6 +1,6 @@
 /*globals window, $, _, Backbone, Validator */
 (function () {
-    "use strict";
+    'use strict';
 
     var Ghost = {
         Layout      : {},
@@ -67,49 +67,49 @@
 /*global window, document, $, FastClick */
 
 (function () {
-    "use strict";
+    'use strict';
 
     FastClick.attach(document.body);
 
     // ### Show content preview when swiping left on content list
-    $(".manage").on("click", ".content-list ol li", function (event) {
+    $('.manage').on('click', '.content-list ol li', function (event) {
         if (window.matchMedia('(max-width: 800px)').matches) {
             event.preventDefault();
             event.stopPropagation();
-            $(".content-list").animate({right: "100%", left: "-100%", 'margin-right': "15px"}, 300);
-            $(".content-preview").animate({right: "0", left: "0", 'margin-left': "0"}, 300);
+            $('.content-list').animate({right: '100%', left: '-100%', 'margin-right': '15px'}, 300);
+            $('.content-preview').animate({right: '0', left: '0', 'margin-left': '0'}, 300);
         }
     });
 
     // ### Hide content preview
-    $(".manage").on("click", ".content-preview .button-back", function (event) {
+    $('.manage').on('click', '.content-preview .button-back', function (event) {
         if (window.matchMedia('(max-width: 800px)').matches) {
             event.preventDefault();
             event.stopPropagation();
-            $(".content-list").animate({right: "0", left: "0", 'margin-right': "0"}, 300);
-            $(".content-preview").animate({right: "-100%", left: "100%", 'margin-left': "15px"}, 300);
+            $('.content-list').animate({right: '0', left: '0', 'margin-right': '0'}, 300);
+            $('.content-preview').animate({right: '-100%', left: '100%', 'margin-left': '15px'}, 300);
         }
     });
 
     // ### Show settings options page when swiping left on settings menu link
-    $(".settings").on("click", ".settings-menu li", function (event) {
+    $('.settings').on('click', '.settings-menu li', function (event) {
         if (window.matchMedia('(max-width: 800px)').matches) {
             event.preventDefault();
             event.stopPropagation();
-            $(".settings-sidebar").animate({right: "100%", left: "-102%", 'margin-right': "15px"}, 300);
-            $(".settings-content").animate({right: "0", left: "0", 'margin-left': "0"}, 300);
-            $(".settings-content .button-back, .settings-content .button-save").css("display", "inline-block");
+            $('.settings-sidebar').animate({right: '100%', left: '-102%', 'margin-right': '15px'}, 300);
+            $('.settings-content').animate({right: '0', left: '0', 'margin-left': '0'}, 300);
+            $('.settings-content .button-back, .settings-content .button-save').css('display', 'inline-block');
         }
     });
 
     // ### Hide settings options page
-    $(".settings").on("click", ".settings-content .button-back", function (event) {
+    $('.settings').on('click', '.settings-content .button-back', function (event) {
         if (window.matchMedia('(max-width: 800px)').matches) {
             event.preventDefault();
             event.stopPropagation();
-            $(".settings-sidebar").animate({right: "0", left: "0", 'margin-right': "0"}, 300);
-            $(".settings-content").animate({right: "-100%", left: "100%", 'margin-left': "15"}, 300);
-            $(".settings-content .button-back, .settings-content .button-save").css("display", "none");
+            $('.settings-sidebar').animate({right: '0', left: '0', 'margin-right': '0'}, 300);
+            $('.settings-content').animate({right: '-100%', left: '100%', 'margin-left': '15'}, 300);
+            $('.settings-content .button-back, .settings-content .button-save').css('display', 'none');
         }
     });
 
@@ -126,7 +126,7 @@
 
 /*global document, $, Ghost */
 (function () {
-    "use strict";
+    'use strict';
 
     Ghost.temporary.hideToggles = function () {
         $('[data-toggle]').each(function () {
@@ -135,7 +135,7 @@
         });
 
         // Toggle active classes on menu headers
-        $("[data-toggle].active").removeClass("active");
+        $('[data-toggle].active').removeClass('active');
     };
 
     Ghost.temporary.initToggles = function ($el) {
@@ -184,7 +184,7 @@
 
 /*global $, window, CodeMirror, Showdown, moment */
 (function () {
-    "use strict";
+    'use strict';
     var Markdown = {
         init : function (options, elem) {
             var self = this;
@@ -199,59 +199,59 @@
         replace: function () {
             var text = this.elem.getSelection(), pass = true, md, cursor, line, word, letterCount, converter;
             switch (this.style) {
-            case "h1":
+            case 'h1':
                 cursor = this.elem.getCursor();
                 line = this.elem.getLine(cursor.line);
-                this.elem.setLine(cursor.line, "# " + line);
+                this.elem.setLine(cursor.line, '# ' + line);
                 this.elem.setCursor(cursor.line, cursor.ch + 2);
                 pass = false;
                 break;
-            case "h2":
+            case 'h2':
                 cursor = this.elem.getCursor();
                 line = this.elem.getLine(cursor.line);
-                this.elem.setLine(cursor.line, "## " + line);
+                this.elem.setLine(cursor.line, '## ' + line);
                 this.elem.setCursor(cursor.line, cursor.ch + 3);
                 pass = false;
                 break;
-            case "h3":
+            case 'h3':
                 cursor = this.elem.getCursor();
                 line = this.elem.getLine(cursor.line);
-                this.elem.setLine(cursor.line, "### " + line);
+                this.elem.setLine(cursor.line, '### ' + line);
                 this.elem.setCursor(cursor.line, cursor.ch + 4);
                 pass = false;
                 break;
-            case "h4":
+            case 'h4':
                 cursor = this.elem.getCursor();
                 line = this.elem.getLine(cursor.line);
-                this.elem.setLine(cursor.line, "#### " + line);
+                this.elem.setLine(cursor.line, '#### ' + line);
                 this.elem.setCursor(cursor.line, cursor.ch + 5);
                 pass = false;
                 break;
-            case "h5":
+            case 'h5':
                 cursor = this.elem.getCursor();
                 line = this.elem.getLine(cursor.line);
-                this.elem.setLine(cursor.line, "##### " + line);
+                this.elem.setLine(cursor.line, '##### ' + line);
                 this.elem.setCursor(cursor.line, cursor.ch + 6);
                 pass = false;
                 break;
-            case "h6":
+            case 'h6':
                 cursor = this.elem.getCursor();
                 line = this.elem.getLine(cursor.line);
-                this.elem.setLine(cursor.line, "###### " + line);
+                this.elem.setLine(cursor.line, '###### ' + line);
                 this.elem.setCursor(cursor.line, cursor.ch + 7);
                 pass = false;
                 break;
-            case "link":
+            case 'link':
                 md = this.options.syntax.link.replace('$1', text);
-                this.elem.replaceSelection(md, "end");
+                this.elem.replaceSelection(md, 'end');
                 cursor = this.elem.getCursor();
                 this.elem.setSelection({line: cursor.line, ch: cursor.ch - 8}, {line: cursor.line, ch: cursor.ch - 1});
                 pass = false;
                 break;
-            case "image":
+            case 'image':
                 cursor = this.elem.getCursor();
                 md = this.options.syntax.image.replace('$1', text);
-                if (this.elem.getLine(cursor.line) !== "") {
+                if (this.elem.getLine(cursor.line) !== '') {
                     md = "\n\n" + md;
                 }
                 this.elem.replaceSelection(md, "end");
@@ -259,16 +259,16 @@
                 this.elem.setSelection({line: cursor.line, ch: cursor.ch - 8}, {line: cursor.line, ch: cursor.ch - 1});
                 pass = false;
                 break;
-            case "uppercase":
+            case 'uppercase':
                 md = text.toLocaleUpperCase();
                 break;
-            case "lowercase":
+            case 'lowercase':
                 md = text.toLocaleLowerCase();
                 break;
-            case "titlecase":
+            case 'titlecase':
                 md = text.toTitleCase();
                 break;
-            case "selectword":
+            case 'selectword':
                 cursor = this.elem.getCursor();
                 word = this.elem.getTokenAt(cursor);
                 if (!/\w$/g.test(word.string)) {
@@ -277,7 +277,7 @@
                     this.elem.setSelection({line: cursor.line, ch: word.start}, {line: cursor.line, ch: word.end});
                 }
                 break;
-            case "copyHTML":
+            case 'copyHTML':
                 converter = new Showdown.converter();
                 if (text) {
                     md = converter.makeHtml(text);
@@ -288,13 +288,15 @@
                 $(".modal-copyToHTML-content").text(md).selectText();
                 pass = false;
                 break;
-            case "list":
-                md = text.replace(/^(\s*)(\w\W*)/gm, "$1* $2");
-                this.elem.replaceSelection(md, "end");
+            case 'list':
+                md = text.replace(/^(\s*)(\w\W*)/gm, '$1* $2');
+                this.elem.replaceSelection(md, 'end');
                 pass = false;
                 break;
-            case "currentDate":
-                md = moment(new Date()).format("D MMMM YYYY");
+            case 'currentDate':
+                md = moment(new Date()).format('D MMMM YYYY');
+                this.elem.replaceSelection(md, 'end');
+                pass = false;
                 break;
             default:
                 if (this.options.syntax[this.style]) {
@@ -302,7 +304,7 @@
                 }
             }
             if (pass && md) {
-                this.elem.replaceSelection(md, "end");
+                this.elem.replaceSelection(md, 'end');
                 if (!text) {
                     letterCount = md.length;
                     cursor = this.elem.getCursor();
@@ -334,9 +336,9 @@
 /*globals Handlebars, moment
 */
 (function () {
-    "use strict";
+    'use strict';
     Handlebars.registerHelper('date', function (context, block) {
-        var f = block.hash.format || "MMM Do, YYYY",
+        var f = block.hash.format || 'MMM Do, YYYY',
             timeago = block.hash.timeago,
             date;
         if (timeago) {

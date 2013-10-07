@@ -1,6 +1,6 @@
 /*global window, document, Ghost, $, _, Backbone */
 (function () {
-    "use strict";
+    'use strict';
 
     Ghost.Models.Post = Backbone.Model.extend({
 
@@ -12,8 +12,8 @@
 
         parse: function (resp) {
             if (resp.status) {
-                resp.published = !!(resp.status === "published");
-                resp.draft = !!(resp.status === "draft");
+                resp.published = !!(resp.status === 'published');
+                resp.draft = !!(resp.status === 'draft');
             }
             if (resp.tags) {
                 // TODO: parse tags into it's own collection on the model (this.tags)
@@ -71,17 +71,17 @@
 
 /*global window, document, Ghost, $, _, Backbone */
 (function () {
-    "use strict";
+    'use strict';
     //id:0 is used to issue PUT requests
     Ghost.Models.Settings = Backbone.Model.extend({
         url: Ghost.settings.apiRoot + '/settings/?type=blog,theme',
-        id: "0"
+        id: '0'
     });
 
 }());
 /*global window, document, Ghost, $, _, Backbone */
 (function () {
-    "use strict";
+    'use strict';
 
     Ghost.Collections.Tags = Backbone.Collection.extend({
         url: Ghost.settings.apiRoot + '/tags/'
@@ -90,7 +90,7 @@
 
 /*global window, document, Ghost, $, _, Backbone */
 (function () {
-    "use strict";
+    'use strict';
 
     Ghost.Models.Themes = Backbone.Model.extend({
         url: Ghost.settings.apiRoot + '/themes'
@@ -99,12 +99,12 @@
 }());
 /*global Ghost, Backbone */
 (function () {
-    "use strict";
+    'use strict';
     Ghost.Models.uploadModal = Backbone.Model.extend({
 
         options: {
             close: true,
-            type: "action",
+            type: 'action',
             style: ["wide"],
             animation: 'fade',
             afterRender: function () {
@@ -135,7 +135,7 @@
 }());
 /*global window, document, Ghost, $, _, Backbone */
 (function () {
-    "use strict";
+    'use strict';
 
     Ghost.Models.User = Backbone.Model.extend({
         url: Ghost.settings.apiRoot + '/users/me/'
@@ -149,16 +149,16 @@
 
 /*global window, document, Ghost, $, _, Backbone */
 (function () {
-    "use strict";
+    'use strict';
 
     Ghost.Models.Widget = Backbone.Model.extend({
 
         defaults: {
-            title: "",
-            name: "",
-            author: "",
-            applicationID: "",
-            size: "",
+            title: '',
+            name: '',
+            author: '',
+            applicationID: '',
+            size: '',
             content: {
                 template: '',
                 data: {
@@ -166,9 +166,9 @@
                         count: 0,
                         sub: {
                             value: 0,
-                            dir: "", // "up" or "down"
-                            item: "",
-                            period: ""
+                            dir: '', // "up" or "down"
+                            item: '',
+                            period: ''
                         }
                     }
                 }
@@ -177,8 +177,8 @@
                 settingsPane: false,
                 enabled: false,
                 options: [{
-                    title: "ERROR",
-                    value: "Widget options not set"
+                    title: 'ERROR',
+                    value: 'Widget options not set'
                 }]
             }
         }

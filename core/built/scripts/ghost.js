@@ -209,8 +209,6 @@ u[o]&&(delete u[o],c?delete n[l]:typeof n.removeAttribute!==i?n.removeAttribute(
             complete: function (result) {
                 var self = this;
 
-                $dropzone.trigger("uploadsuccess", [result, $dropzone.attr('id')]);
-
                 function showImage(width, height) {
                     $dropzone.find('img.js-upload-target').attr({"width": width, "height": height}).css({"display": "block"});
                     $dropzone.find('.fileupload-loading').remove();
@@ -323,7 +321,7 @@ u[o]&&(delete u[o],c?delete n[l]:typeof n.removeAttribute!==i?n.removeAttribute(
                 var self = this;
                 //This is the start point if no image exists
                 $dropzone.find('img.js-upload-target').css({"display": "none"});
-                $dropzone.removeClass('pre-image-uploader').addClass('image-uploader');
+                $dropzone.removeClass('pre-image-uploader image-uploader-url').addClass('image-uploader');
                 this.removeExtras();
                 this.buildExtras();
                 this.bindFileUpload();
@@ -334,6 +332,7 @@ u[o]&&(delete u[o],c?delete n[l]:typeof n.removeAttribute!==i?n.removeAttribute(
             initUrl: function () {
                 var self = this, val;
                 this.removeExtras();
+                $dropzone.addClass('image-uploader-url').removeClass('pre-image-uploader');
                 $dropzone.find('.js-fileupload').addClass('right');
                 $dropzone.append($cancel);
                 $dropzone.find('.js-cancel').on('click', function () {
@@ -349,6 +348,7 @@ u[o]&&(delete u[o],c?delete n[l]:typeof n.removeAttribute!==i?n.removeAttribute(
                 $dropzone.find('div.description').before($url);
 
                 $dropzone.find('.js-button-accept').on('click', function () {
+                    $dropzone.trigger('uploadstart', [$dropzone.attr('id')]);
                     $dropzone.find('div.description').hide();
                     val = $('#uploadurl').val();
                     $dropzone.find('.js-fileupload').removeClass('right');
@@ -361,7 +361,7 @@ u[o]&&(delete u[o],c?delete n[l]:typeof n.removeAttribute!==i?n.removeAttribute(
                 var self = this;
                 // This is the start point if an image already exists
                 source = $dropzone.find('img.js-upload-target').attr('src');
-                $dropzone.removeClass('image-uploader').addClass('pre-image-uploader');
+                $dropzone.removeClass('image-uploader image-uploader-url').addClass('pre-image-uploader');
                 $dropzone.find('div.description').hide();
                 $dropzone.append($cancel);
                 $dropzone.find('.js-cancel').on('click', function () {
@@ -13931,10 +13931,10 @@ var Showdown={extensions:{}},forEach=Showdown.forEach=function(a,b){if(typeof a.
                 }
             },
             {
-                // GFM newline and underscore modifications
+                // GFM newline and underscore modifications, happen BEFORE showdown
                 type    : 'lang',
                 filter  : function (text) {
-                    var extractions = {},
+                    var preExtractions = {},
                         imageMarkdownRegex = /^(?:\{(.*?)\})?!(?:\[([^\n\]]*)\])(?:\(([^\n\]]*)\))?$/gim,
                         hashID = 0;
 
@@ -13945,14 +13945,9 @@ var Showdown={extensions:{}},forEach=Showdown.forEach=function(a,b){if(typeof a.
                     // Extract pre blocks
                     text = text.replace(/<pre>[\s\S]*?<\/pre>/gim, function (x) {
                         var hash = hashId();
-                        extractions[hash] = x;
+                        preExtractions[hash] = x;
                         return "{gfm-js-extract-pre-" + hash + "}";
                     }, 'm');
-
-                    // better URL support, but no title support
-                    text = text.replace(imageMarkdownRegex, function (match, key, alt, src) {
-                        return '<img src="' + src + '" alt="' + alt + '" />';
-                    });
 
                     //prevent foo_bar and foo_bar_baz from ending up with an italic word in the middle
                     text = text.replace(/(^(?! {4}|\t)\w+_\w+_\w[\w_]*)/gm, function (x) {
@@ -13964,8 +13959,17 @@ var Showdown={extensions:{}},forEach=Showdown.forEach=function(a,b){if(typeof a.
                         return x.match(/\n{2}/) ? x : x.trim() + "  \n";
                     });
 
+                    // better URL support, but no title support
+                    text = text.replace(imageMarkdownRegex, function (match, key, alt, src) {
+                        if (src) {
+                            return '<img src="' + src + '" alt="' + alt + '" />';
+                        }
+
+                        return '';
+                    });
+
                     text = text.replace(/\{gfm-js-extract-pre-([0-9]+)\}/gm, function (x, y) {
-                        return "\n\n" + extractions[y];
+                        return "\n\n" + preExtractions[y];
                     });
 
 
@@ -13973,22 +13977,30 @@ var Showdown={extensions:{}},forEach=Showdown.forEach=function(a,b){if(typeof a.
                 }
             },
             {
-                // Auto-link URLs and emails
-                type    : 'lang',
+                // GFM autolinking & custom image handling, happens AFTER showdown
+                type    : 'html',
                 filter  : function (text) {
-                    var extractions = {},
+                    var refExtractions = {},
+                        preExtractions = {},
                         hashID = 0;
 
                     function hashId() {
                         return hashID++;
                     }
 
+                    // Extract pre blocks
+                    text = text.replace(/<(pre|code)>[\s\S]*?<\/(\1)>/gim, function (x) {
+                        var hash = hashId();
+                        preExtractions[hash] = x;
+                        return "{gfm-js-extract-pre-" + hash + "}";
+                    }, 'm');
+
                     // filter out def urls
                     // from Marked https://github.com/chjj/marked/blob/master/lib/marked.js#L24
                     text = text.replace(/^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/gmi,
                         function (x) {
                             var hash = hashId();
-                            extractions[hash] = x;
+                            refExtractions[hash] = x;
                             return "{gfm-js-extract-ref-url-" + hash + "}";
                         });
 
@@ -14006,13 +14018,18 @@ var Showdown={extensions:{}},forEach=Showdown.forEach=function(a,b){if(typeof a.
                             return lookBehind ? wholeMatch : "<a href='" + wholeMatch + "'>" + wholeMatch + "</a>";
                         });
 
-                    // match emil
+                    // match email
                     text = text.replace(/[a-z0-9_\-+=.]+@[a-z0-9\-]+(\.[a-z0-9-]+)+/gmi, function (wholeMatch) {
                         return "<a href='mailto:" + wholeMatch + "'>" + wholeMatch + "</a>";
                     });
 
+                    // replace extractions
+                    text = text.replace(/\{gfm-js-extract-pre-([0-9]+)\}/gm, function (x, y) {
+                        return preExtractions[y];
+                    });
+
                     text = text.replace(/\{gfm-js-extract-ref-url-([0-9]+)\}/gi, function (x, y) {
-                        return "\n\n" + extractions[y];
+                        return "\n\n" + refExtractions[y];
                     });
 
                     return text;
@@ -16436,7 +16453,7 @@ if (typeof define !== 'undefined' && define.amd) {
 }
 /*globals window, $, _, Backbone, Validator */
 (function () {
-    "use strict";
+    'use strict';
 
     var Ghost = {
         Layout      : {},
@@ -16503,49 +16520,49 @@ if (typeof define !== 'undefined' && define.amd) {
 /*global window, document, $, FastClick */
 
 (function () {
-    "use strict";
+    'use strict';
 
     FastClick.attach(document.body);
 
     // ### Show content preview when swiping left on content list
-    $(".manage").on("click", ".content-list ol li", function (event) {
+    $('.manage').on('click', '.content-list ol li', function (event) {
         if (window.matchMedia('(max-width: 800px)').matches) {
             event.preventDefault();
             event.stopPropagation();
-            $(".content-list").animate({right: "100%", left: "-100%", 'margin-right': "15px"}, 300);
-            $(".content-preview").animate({right: "0", left: "0", 'margin-left': "0"}, 300);
+            $('.content-list').animate({right: '100%', left: '-100%', 'margin-right': '15px'}, 300);
+            $('.content-preview').animate({right: '0', left: '0', 'margin-left': '0'}, 300);
         }
     });
 
     // ### Hide content preview
-    $(".manage").on("click", ".content-preview .button-back", function (event) {
+    $('.manage').on('click', '.content-preview .button-back', function (event) {
         if (window.matchMedia('(max-width: 800px)').matches) {
             event.preventDefault();
             event.stopPropagation();
-            $(".content-list").animate({right: "0", left: "0", 'margin-right': "0"}, 300);
-            $(".content-preview").animate({right: "-100%", left: "100%", 'margin-left': "15px"}, 300);
+            $('.content-list').animate({right: '0', left: '0', 'margin-right': '0'}, 300);
+            $('.content-preview').animate({right: '-100%', left: '100%', 'margin-left': '15px'}, 300);
         }
     });
 
     // ### Show settings options page when swiping left on settings menu link
-    $(".settings").on("click", ".settings-menu li", function (event) {
+    $('.settings').on('click', '.settings-menu li', function (event) {
         if (window.matchMedia('(max-width: 800px)').matches) {
             event.preventDefault();
             event.stopPropagation();
-            $(".settings-sidebar").animate({right: "100%", left: "-102%", 'margin-right': "15px"}, 300);
-            $(".settings-content").animate({right: "0", left: "0", 'margin-left': "0"}, 300);
-            $(".settings-content .button-back, .settings-content .button-save").css("display", "inline-block");
+            $('.settings-sidebar').animate({right: '100%', left: '-102%', 'margin-right': '15px'}, 300);
+            $('.settings-content').animate({right: '0', left: '0', 'margin-left': '0'}, 300);
+            $('.settings-content .button-back, .settings-content .button-save').css('display', 'inline-block');
         }
     });
 
     // ### Hide settings options page
-    $(".settings").on("click", ".settings-content .button-back", function (event) {
+    $('.settings').on('click', '.settings-content .button-back', function (event) {
         if (window.matchMedia('(max-width: 800px)').matches) {
             event.preventDefault();
             event.stopPropagation();
-            $(".settings-sidebar").animate({right: "0", left: "0", 'margin-right': "0"}, 300);
-            $(".settings-content").animate({right: "-100%", left: "100%", 'margin-left': "15"}, 300);
-            $(".settings-content .button-back, .settings-content .button-save").css("display", "none");
+            $('.settings-sidebar').animate({right: '0', left: '0', 'margin-right': '0'}, 300);
+            $('.settings-content').animate({right: '-100%', left: '100%', 'margin-left': '15'}, 300);
+            $('.settings-content .button-back, .settings-content .button-save').css('display', 'none');
         }
     });
 
@@ -16562,7 +16579,7 @@ if (typeof define !== 'undefined' && define.amd) {
 
 /*global document, $, Ghost */
 (function () {
-    "use strict";
+    'use strict';
 
     Ghost.temporary.hideToggles = function () {
         $('[data-toggle]').each(function () {
@@ -16571,7 +16588,7 @@ if (typeof define !== 'undefined' && define.amd) {
         });
 
         // Toggle active classes on menu headers
-        $("[data-toggle].active").removeClass("active");
+        $('[data-toggle].active').removeClass('active');
     };
 
     Ghost.temporary.initToggles = function ($el) {
@@ -16620,7 +16637,7 @@ if (typeof define !== 'undefined' && define.amd) {
 
 /*global $, window, CodeMirror, Showdown, moment */
 (function () {
-    "use strict";
+    'use strict';
     var Markdown = {
         init : function (options, elem) {
             var self = this;
@@ -16635,59 +16652,59 @@ if (typeof define !== 'undefined' && define.amd) {
         replace: function () {
             var text = this.elem.getSelection(), pass = true, md, cursor, line, word, letterCount, converter;
             switch (this.style) {
-            case "h1":
+            case 'h1':
                 cursor = this.elem.getCursor();
                 line = this.elem.getLine(cursor.line);
-                this.elem.setLine(cursor.line, "# " + line);
+                this.elem.setLine(cursor.line, '# ' + line);
                 this.elem.setCursor(cursor.line, cursor.ch + 2);
                 pass = false;
                 break;
-            case "h2":
+            case 'h2':
                 cursor = this.elem.getCursor();
                 line = this.elem.getLine(cursor.line);
-                this.elem.setLine(cursor.line, "## " + line);
+                this.elem.setLine(cursor.line, '## ' + line);
                 this.elem.setCursor(cursor.line, cursor.ch + 3);
                 pass = false;
                 break;
-            case "h3":
+            case 'h3':
                 cursor = this.elem.getCursor();
                 line = this.elem.getLine(cursor.line);
-                this.elem.setLine(cursor.line, "### " + line);
+                this.elem.setLine(cursor.line, '### ' + line);
                 this.elem.setCursor(cursor.line, cursor.ch + 4);
                 pass = false;
                 break;
-            case "h4":
+            case 'h4':
                 cursor = this.elem.getCursor();
                 line = this.elem.getLine(cursor.line);
-                this.elem.setLine(cursor.line, "#### " + line);
+                this.elem.setLine(cursor.line, '#### ' + line);
                 this.elem.setCursor(cursor.line, cursor.ch + 5);
                 pass = false;
                 break;
-            case "h5":
+            case 'h5':
                 cursor = this.elem.getCursor();
                 line = this.elem.getLine(cursor.line);
-                this.elem.setLine(cursor.line, "##### " + line);
+                this.elem.setLine(cursor.line, '##### ' + line);
                 this.elem.setCursor(cursor.line, cursor.ch + 6);
                 pass = false;
                 break;
-            case "h6":
+            case 'h6':
                 cursor = this.elem.getCursor();
                 line = this.elem.getLine(cursor.line);
-                this.elem.setLine(cursor.line, "###### " + line);
+                this.elem.setLine(cursor.line, '###### ' + line);
                 this.elem.setCursor(cursor.line, cursor.ch + 7);
                 pass = false;
                 break;
-            case "link":
+            case 'link':
                 md = this.options.syntax.link.replace('$1', text);
-                this.elem.replaceSelection(md, "end");
+                this.elem.replaceSelection(md, 'end');
                 cursor = this.elem.getCursor();
                 this.elem.setSelection({line: cursor.line, ch: cursor.ch - 8}, {line: cursor.line, ch: cursor.ch - 1});
                 pass = false;
                 break;
-            case "image":
+            case 'image':
                 cursor = this.elem.getCursor();
                 md = this.options.syntax.image.replace('$1', text);
-                if (this.elem.getLine(cursor.line) !== "") {
+                if (this.elem.getLine(cursor.line) !== '') {
                     md = "\n\n" + md;
                 }
                 this.elem.replaceSelection(md, "end");
@@ -16695,16 +16712,16 @@ if (typeof define !== 'undefined' && define.amd) {
                 this.elem.setSelection({line: cursor.line, ch: cursor.ch - 8}, {line: cursor.line, ch: cursor.ch - 1});
                 pass = false;
                 break;
-            case "uppercase":
+            case 'uppercase':
                 md = text.toLocaleUpperCase();
                 break;
-            case "lowercase":
+            case 'lowercase':
                 md = text.toLocaleLowerCase();
                 break;
-            case "titlecase":
+            case 'titlecase':
                 md = text.toTitleCase();
                 break;
-            case "selectword":
+            case 'selectword':
                 cursor = this.elem.getCursor();
                 word = this.elem.getTokenAt(cursor);
                 if (!/\w$/g.test(word.string)) {
@@ -16713,7 +16730,7 @@ if (typeof define !== 'undefined' && define.amd) {
                     this.elem.setSelection({line: cursor.line, ch: word.start}, {line: cursor.line, ch: word.end});
                 }
                 break;
-            case "copyHTML":
+            case 'copyHTML':
                 converter = new Showdown.converter();
                 if (text) {
                     md = converter.makeHtml(text);
@@ -16724,13 +16741,15 @@ if (typeof define !== 'undefined' && define.amd) {
                 $(".modal-copyToHTML-content").text(md).selectText();
                 pass = false;
                 break;
-            case "list":
-                md = text.replace(/^(\s*)(\w\W*)/gm, "$1* $2");
-                this.elem.replaceSelection(md, "end");
+            case 'list':
+                md = text.replace(/^(\s*)(\w\W*)/gm, '$1* $2');
+                this.elem.replaceSelection(md, 'end');
                 pass = false;
                 break;
-            case "currentDate":
-                md = moment(new Date()).format("D MMMM YYYY");
+            case 'currentDate':
+                md = moment(new Date()).format('D MMMM YYYY');
+                this.elem.replaceSelection(md, 'end');
+                pass = false;
                 break;
             default:
                 if (this.options.syntax[this.style]) {
@@ -16738,7 +16757,7 @@ if (typeof define !== 'undefined' && define.amd) {
                 }
             }
             if (pass && md) {
-                this.elem.replaceSelection(md, "end");
+                this.elem.replaceSelection(md, 'end');
                 if (!text) {
                     letterCount = md.length;
                     cursor = this.elem.getCursor();
@@ -16770,9 +16789,9 @@ if (typeof define !== 'undefined' && define.amd) {
 /*globals Handlebars, moment
 */
 (function () {
-    "use strict";
+    'use strict';
     Handlebars.registerHelper('date', function (context, block) {
-        var f = block.hash.format || "MMM Do, YYYY",
+        var f = block.hash.format || 'MMM Do, YYYY',
             timeago = block.hash.timeago,
             date;
         if (timeago) {
@@ -17276,7 +17295,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   });
 /*global window, document, Ghost, $, _, Backbone */
 (function () {
-    "use strict";
+    'use strict';
 
     Ghost.Models.Post = Backbone.Model.extend({
 
@@ -17288,8 +17307,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
         parse: function (resp) {
             if (resp.status) {
-                resp.published = !!(resp.status === "published");
-                resp.draft = !!(resp.status === "draft");
+                resp.published = !!(resp.status === 'published');
+                resp.draft = !!(resp.status === 'draft');
             }
             if (resp.tags) {
                 // TODO: parse tags into it's own collection on the model (this.tags)
@@ -17347,17 +17366,17 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 /*global window, document, Ghost, $, _, Backbone */
 (function () {
-    "use strict";
+    'use strict';
     //id:0 is used to issue PUT requests
     Ghost.Models.Settings = Backbone.Model.extend({
         url: Ghost.settings.apiRoot + '/settings/?type=blog,theme',
-        id: "0"
+        id: '0'
     });
 
 }());
 /*global window, document, Ghost, $, _, Backbone */
 (function () {
-    "use strict";
+    'use strict';
 
     Ghost.Collections.Tags = Backbone.Collection.extend({
         url: Ghost.settings.apiRoot + '/tags/'
@@ -17366,7 +17385,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 /*global window, document, Ghost, $, _, Backbone */
 (function () {
-    "use strict";
+    'use strict';
 
     Ghost.Models.Themes = Backbone.Model.extend({
         url: Ghost.settings.apiRoot + '/themes'
@@ -17375,12 +17394,12 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 }());
 /*global Ghost, Backbone */
 (function () {
-    "use strict";
+    'use strict';
     Ghost.Models.uploadModal = Backbone.Model.extend({
 
         options: {
             close: true,
-            type: "action",
+            type: 'action',
             style: ["wide"],
             animation: 'fade',
             afterRender: function () {
@@ -17411,7 +17430,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 }());
 /*global window, document, Ghost, $, _, Backbone */
 (function () {
-    "use strict";
+    'use strict';
 
     Ghost.Models.User = Backbone.Model.extend({
         url: Ghost.settings.apiRoot + '/users/me/'
@@ -17425,16 +17444,16 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 /*global window, document, Ghost, $, _, Backbone */
 (function () {
-    "use strict";
+    'use strict';
 
     Ghost.Models.Widget = Backbone.Model.extend({
 
         defaults: {
-            title: "",
-            name: "",
-            author: "",
-            applicationID: "",
-            size: "",
+            title: '',
+            name: '',
+            author: '',
+            applicationID: '',
+            size: '',
             content: {
                 template: '',
                 data: {
@@ -17442,9 +17461,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                         count: 0,
                         sub: {
                             value: 0,
-                            dir: "", // "up" or "down"
-                            item: "",
-                            period: ""
+                            dir: '', // "up" or "down"
+                            item: '',
+                            period: ''
                         }
                     }
                 }
@@ -17453,8 +17472,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 settingsPane: false,
                 enabled: false,
                 options: [{
-                    title: "ERROR",
-                    value: "Widget options not set"
+                    title: 'ERROR',
+                    value: 'Widget options not set'
                 }]
             }
         }
@@ -18653,7 +18672,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.addSubview(new PublishBar({el: "#publish-bar", model: this.model})).render();
 
             this.$('#entry-title').val(this.model.get('title')).focus();
-            this.$('#entry-markdown').html(this.model.get('markdown'));
+            this.$('#entry-markdown').text(this.model.get('markdown'));
 
             this.initMarkdown();
             this.renderPreview();

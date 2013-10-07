@@ -1823,11 +1823,8 @@ main {
   text-transform: uppercase;
   font-size: 0.85em;
   color: #aaa9a2;
-  background: -moz-linear-gradient(top, white 0%, white 25%, rgba(255, 255, 255, 0.9) 100%);
   background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(25%, white), color-stop(100%, rgba(255, 255, 255, 0.9)));
   background: -webkit-linear-gradient(top, white 0%, white 25%, rgba(255, 255, 255, 0.9) 100%);
-  background: -o-linear-gradient(top, white 0%, white 25%, rgba(255, 255, 255, 0.9) 100%);
-  background: -ms-linear-gradient(top, white 0%, white 25%, rgba(255, 255, 255, 0.9) 100%);
   background: linear, to bottom, white 0%, white 25%, rgba(255, 255, 255, 0.9) 100%; }
   .floatingheader button, .floatingheader .button {
     display: inline-block;
@@ -1898,13 +1895,11 @@ main {
     text-decoration: none; }
     .image-uploader a:hover {
       color: #242628; }
-  .image-uploader .description {
-    margin-top: 10px;
-    margin-bottom: -40px; }
   .image-uploader .centre {
     position: relative;
     top: 50px;
-    margin-bottom: -6px; }
+    display: block;
+    margin: 0 auto -6px auto; }
   .image-uploader .media:before {
     font-family: "Icons";
     font-weight: normal;
@@ -1975,11 +1970,12 @@ main {
       text-decoration: none; }
   .image-uploader .image-cancel {
     position: absolute;
-    color: white;
-    text-shadow: rgba(0, 0, 0, 0.3) 0 0 3px;
     top: 10px;
     right: 10px;
-    text-decoration: none; }
+    padding: 8px;
+    color: #aaa9a2;
+    text-decoration: none;
+    line-height: 0; }
     .image-uploader .image-cancel:before {
       font-family: "Icons";
       font-weight: normal;
@@ -1990,12 +1986,11 @@ main {
       line-height: 1;
       -webkit-font-smoothing: antialiased;
       content: "\e034";
-      font-size: 16px; }
+      font-size: 14px; }
     .image-uploader .image-cancel:hover {
       text-decoration: none; }
     .image-uploader .image-cancel:hover {
-      cursor: pointer;
-      color: white; }
+      cursor: pointer; }
   .image-uploader input.main {
     position: absolute;
     right: 0;
@@ -2063,6 +2058,10 @@ main {
     .image-uploader .bar.fail {
       background: #e25440; }
 
+.image-uploader-url .description {
+  margin-top: 10px;
+  margin-bottom: -40px; }
+
 .pre-image-uploader {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -2073,7 +2072,8 @@ main {
   height: auto;
   color: #aaa9a2;
   background: rgba(0, 0, 0, 0.1);
-  border-radius: 2px; }
+  border-radius: 2px;
+  min-height: 46px; }
   .pre-image-uploader input {
     position: absolute;
     left: 9999px;
@@ -4334,11 +4334,8 @@ body.zen {
       margin-bottom: 0;
       border-bottom: none;
       box-shadow: #edece4 0 -1px 0 inset, #edece4 1px 0 0;
-      background: -moz-linear-gradient(top, white 0%, white 25%, rgba(255, 255, 255, 0.9) 100%);
       background: -webkit-gradient(linear, left top, left bottom, color-stop(0%, white), color-stop(25%, white), color-stop(100%, rgba(255, 255, 255, 0.9)));
       background: -webkit-linear-gradient(top, white 0%, white 25%, rgba(255, 255, 255, 0.9) 100%);
-      background: -o-linear-gradient(top, white 0%, white 25%, rgba(255, 255, 255, 0.9) 100%);
-      background: -ms-linear-gradient(top, white 0%, white 25%, rgba(255, 255, 255, 0.9) 100%);
       background: linear, to bottom, white 0%, white 25%, rgba(255, 255, 255, 0.9) 100%; }
       @media (max-width: 1000px), (max-width: 1000px) {
         .settings .settings-sidebar > header {

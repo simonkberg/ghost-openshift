@@ -209,8 +209,6 @@ u[o]&&(delete u[o],c?delete n[l]:typeof n.removeAttribute!==i?n.removeAttribute(
             complete: function (result) {
                 var self = this;
 
-                $dropzone.trigger("uploadsuccess", [result, $dropzone.attr('id')]);
-
                 function showImage(width, height) {
                     $dropzone.find('img.js-upload-target').attr({"width": width, "height": height}).css({"display": "block"});
                     $dropzone.find('.fileupload-loading').remove();
@@ -323,7 +321,7 @@ u[o]&&(delete u[o],c?delete n[l]:typeof n.removeAttribute!==i?n.removeAttribute(
                 var self = this;
                 //This is the start point if no image exists
                 $dropzone.find('img.js-upload-target').css({"display": "none"});
-                $dropzone.removeClass('pre-image-uploader').addClass('image-uploader');
+                $dropzone.removeClass('pre-image-uploader image-uploader-url').addClass('image-uploader');
                 this.removeExtras();
                 this.buildExtras();
                 this.bindFileUpload();
@@ -334,6 +332,7 @@ u[o]&&(delete u[o],c?delete n[l]:typeof n.removeAttribute!==i?n.removeAttribute(
             initUrl: function () {
                 var self = this, val;
                 this.removeExtras();
+                $dropzone.addClass('image-uploader-url').removeClass('pre-image-uploader');
                 $dropzone.find('.js-fileupload').addClass('right');
                 $dropzone.append($cancel);
                 $dropzone.find('.js-cancel').on('click', function () {
@@ -349,6 +348,7 @@ u[o]&&(delete u[o],c?delete n[l]:typeof n.removeAttribute!==i?n.removeAttribute(
                 $dropzone.find('div.description').before($url);
 
                 $dropzone.find('.js-button-accept').on('click', function () {
+                    $dropzone.trigger('uploadstart', [$dropzone.attr('id')]);
                     $dropzone.find('div.description').hide();
                     val = $('#uploadurl').val();
                     $dropzone.find('.js-fileupload').removeClass('right');
@@ -361,7 +361,7 @@ u[o]&&(delete u[o],c?delete n[l]:typeof n.removeAttribute!==i?n.removeAttribute(
                 var self = this;
                 // This is the start point if an image already exists
                 source = $dropzone.find('img.js-upload-target').attr('src');
-                $dropzone.removeClass('image-uploader').addClass('pre-image-uploader');
+                $dropzone.removeClass('image-uploader image-uploader-url').addClass('pre-image-uploader');
                 $dropzone.find('div.description').hide();
                 $dropzone.append($cancel);
                 $dropzone.find('.js-cancel').on('click', function () {
@@ -13931,10 +13931,10 @@ var Showdown={extensions:{}},forEach=Showdown.forEach=function(a,b){if(typeof a.
                 }
             },
             {
-                // GFM newline and underscore modifications
+                // GFM newline and underscore modifications, happen BEFORE showdown
                 type    : 'lang',
                 filter  : function (text) {
-                    var extractions = {},
+                    var preExtractions = {},
                         imageMarkdownRegex = /^(?:\{(.*?)\})?!(?:\[([^\n\]]*)\])(?:\(([^\n\]]*)\))?$/gim,
                         hashID = 0;
 
@@ -13945,14 +13945,9 @@ var Showdown={extensions:{}},forEach=Showdown.forEach=function(a,b){if(typeof a.
                     // Extract pre blocks
                     text = text.replace(/<pre>[\s\S]*?<\/pre>/gim, function (x) {
                         var hash = hashId();
-                        extractions[hash] = x;
+                        preExtractions[hash] = x;
                         return "{gfm-js-extract-pre-" + hash + "}";
                     }, 'm');
-
-                    // better URL support, but no title support
-                    text = text.replace(imageMarkdownRegex, function (match, key, alt, src) {
-                        return '<img src="' + src + '" alt="' + alt + '" />';
-                    });
 
                     //prevent foo_bar and foo_bar_baz from ending up with an italic word in the middle
                     text = text.replace(/(^(?! {4}|\t)\w+_\w+_\w[\w_]*)/gm, function (x) {
@@ -13964,8 +13959,17 @@ var Showdown={extensions:{}},forEach=Showdown.forEach=function(a,b){if(typeof a.
                         return x.match(/\n{2}/) ? x : x.trim() + "  \n";
                     });
 
+                    // better URL support, but no title support
+                    text = text.replace(imageMarkdownRegex, function (match, key, alt, src) {
+                        if (src) {
+                            return '<img src="' + src + '" alt="' + alt + '" />';
+                        }
+
+                        return '';
+                    });
+
                     text = text.replace(/\{gfm-js-extract-pre-([0-9]+)\}/gm, function (x, y) {
-                        return "\n\n" + extractions[y];
+                        return "\n\n" + preExtractions[y];
                     });
 
 
@@ -13973,22 +13977,30 @@ var Showdown={extensions:{}},forEach=Showdown.forEach=function(a,b){if(typeof a.
                 }
             },
             {
-                // Auto-link URLs and emails
-                type    : 'lang',
+                // GFM autolinking & custom image handling, happens AFTER showdown
+                type    : 'html',
                 filter  : function (text) {
-                    var extractions = {},
+                    var refExtractions = {},
+                        preExtractions = {},
                         hashID = 0;
 
                     function hashId() {
                         return hashID++;
                     }
 
+                    // Extract pre blocks
+                    text = text.replace(/<(pre|code)>[\s\S]*?<\/(\1)>/gim, function (x) {
+                        var hash = hashId();
+                        preExtractions[hash] = x;
+                        return "{gfm-js-extract-pre-" + hash + "}";
+                    }, 'm');
+
                     // filter out def urls
                     // from Marked https://github.com/chjj/marked/blob/master/lib/marked.js#L24
                     text = text.replace(/^ *\[([^\]]+)\]: *<?([^\s>]+)>?(?: +["(]([^\n]+)[")])? *(?:\n+|$)/gmi,
                         function (x) {
                             var hash = hashId();
-                            extractions[hash] = x;
+                            refExtractions[hash] = x;
                             return "{gfm-js-extract-ref-url-" + hash + "}";
                         });
 
@@ -14006,13 +14018,18 @@ var Showdown={extensions:{}},forEach=Showdown.forEach=function(a,b){if(typeof a.
                             return lookBehind ? wholeMatch : "<a href='" + wholeMatch + "'>" + wholeMatch + "</a>";
                         });
 
-                    // match emil
+                    // match email
                     text = text.replace(/[a-z0-9_\-+=.]+@[a-z0-9\-]+(\.[a-z0-9-]+)+/gmi, function (wholeMatch) {
                         return "<a href='mailto:" + wholeMatch + "'>" + wholeMatch + "</a>";
                     });
 
+                    // replace extractions
+                    text = text.replace(/\{gfm-js-extract-pre-([0-9]+)\}/gm, function (x, y) {
+                        return preExtractions[y];
+                    });
+
                     text = text.replace(/\{gfm-js-extract-ref-url-([0-9]+)\}/gi, function (x, y) {
-                        return "\n\n" + extractions[y];
+                        return "\n\n" + refExtractions[y];
                     });
 
                     return text;
