@@ -5,13 +5,13 @@ Getting Ghost "Kerouac" running on OpenShift
 
 ---
 
-You'll have to manually copy the database to the `data`-directory outside of the `repo` on OpenShift to prevent the database from being overwritten upon deploy.
-
-After first deploy:
-
-1. SSH into your app `rhc ssh APPNAME`
-2. copy db `cp app-root/repo/content/data/*.db app-root/data/`
+The database gets created in the `data`-directory outside of the `repo` on OpenShift, to prevent it from being overwritten upon deploy.
 
 ---
 
+We need to define a main script in `package.json` for OpenShift to know which script to run.
+
+---
+
+By default, this setup is running as `production`.
 To change environment, check `.openshift/action_hooks/pre_start`
