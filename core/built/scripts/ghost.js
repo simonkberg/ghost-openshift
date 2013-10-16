@@ -193,7 +193,7 @@ u[o]&&(delete u[o],c?delete n[l]:typeof n.removeAttribute!==i?n.removeAttribute(
 
     UploadUi = function ($dropzone, settings) {
         var source,
-            $url = '<div class="js-url"><input id="uploadurl" class="url" type="url" placeholder="http://"/></div>',
+            $url = '<div class="js-url"><input class="url js-upload-url" type="url" placeholder="http://"/></div>',
             $cancel = '<a class="image-cancel js-cancel"><span class="hidden">Delete</span></a>',
             $progress =  $('<div />', {
                 "class" : "js-upload-progress progress progress-success active",
@@ -243,7 +243,6 @@ u[o]&&(delete u[o],c?delete n[l]:typeof n.removeAttribute!==i?n.removeAttribute(
                     }).attr('src', result);
                 }
                 preLoadImage();
-
             },
 
             bindFileUpload: function () {
@@ -348,17 +347,21 @@ u[o]&&(delete u[o],c?delete n[l]:typeof n.removeAttribute!==i?n.removeAttribute(
                 $dropzone.find('div.description').before($url);
 
                 $dropzone.find('.js-button-accept').on('click', function () {
-                    $dropzone.trigger('uploadstart', [$dropzone.attr('id')]);
+                    val = $dropzone.find('.js-upload-url').val();
                     $dropzone.find('div.description').hide();
-                    val = $('#uploadurl').val();
                     $dropzone.find('.js-fileupload').removeClass('right');
                     $dropzone.find('.js-url').remove();
                     $dropzone.find('button.centre').remove();
-                    self.complete(val);
+                    if (val === "") {
+                        $dropzone.trigger("uploadsuccess", 'http://');
+                        self.initWithDropzone();
+                    } else {
+                        self.complete(val);
+                    }
                 });
             },
             initWithImage: function () {
-                var self = this;
+                var self = this, val;
                 // This is the start point if an image already exists
                 source = $dropzone.find('img.js-upload-target').attr('src');
                 $dropzone.removeClass('image-uploader image-uploader-url').addClass('pre-image-uploader');
@@ -367,6 +370,11 @@ u[o]&&(delete u[o],c?delete n[l]:typeof n.removeAttribute!==i?n.removeAttribute(
                 $dropzone.find('.js-cancel').on('click', function () {
                     $dropzone.find('img.js-upload-target').attr({'src': ''});
                     $dropzone.find('div.description').show();
+                    $dropzone.delay(2500).animate({opacity: 100}, 1000, function () {
+                        self.init();
+                    });
+
+                    $dropzone.trigger("uploadsuccess", 'http://');
                     self.initWithDropzone();
                 });
             },
@@ -16849,8 +16857,8 @@ function program5(depth0,data) {
   buffer += "\" href=\"#\">\n    <h3 class=\"entry-title\">";
   if (stack1 = helpers.title) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.title; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
-  buffer += escapeExpression(stack1)
-    + "</h3>\n    <section class=\"entry-meta\">\n        <time datetime=\"2013-01-04\" class=\"date\">\n            ";
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "</h3>\n    <section class=\"entry-meta\">\n        <time datetime=\"2013-01-04\" class=\"date\">\n            ";
   stack1 = helpers['if'].call(depth0, depth0.published, {hash:{},inverse:self.program(5, program5, data),fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n        </time>\n        "
@@ -18674,6 +18682,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             this.$('#entry-title').val(this.model.get('title')).focus();
             this.$('#entry-markdown').text(this.model.get('markdown'));
 
+            this.listenTo(this.model, 'change:title', this.renderTitle);
+
             this.initMarkdown();
             this.renderPreview();
 
@@ -18754,6 +18764,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             }
         },
 
+        renderTitle: function () {
+            this.$('#entry-title').val(this.model.get('title'));
+        },
+
         // This is a hack to remove iOS6 white space on orientation change bug
         // See: http://cl.ly/RGx9
         orientationChange: function () {
@@ -18825,10 +18839,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         initUploads: function () {
             this.$('.js-drop-zone').upload({editor: true});
             this.$('.js-drop-zone').on('uploadstart', $.proxy(this.disableEditor, this));
-            this.$('.js-drop-zone').on('uploadstart', this.uploadMgr.handleDownloadStart);
             this.$('.js-drop-zone').on('uploadfailure', $.proxy(this.enableEditor, this));
             this.$('.js-drop-zone').on('uploadsuccess', $.proxy(this.enableEditor, this));
-            this.$('.js-drop-zone').on('uploadsuccess', this.uploadMgr.handleDownloadSuccess);
+            this.$('.js-drop-zone').on('uploadsuccess', this.uploadMgr.handleUpload);
         },
 
         enableEditor: function () {
@@ -18993,7 +19006,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
             // TODO: hasMarker but no image?
         }
 
-        function handleDownloadStart(e) {
+        function handleUpload(e, result_src) {
             /*jslint regexp: true, bitwise: true */
             var line = findLine($(e.currentTarget).attr('id')),
                 lineNumber = editor.getLineNumber(line),
@@ -19018,9 +19031,6 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     );
                 }
             }
-        }
-
-        function handleDownloadSuccess(e, result_src) {
             editor.replaceSelection(result_src);
         }
 
@@ -19037,8 +19047,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         // Public API
         _.extend(this, {
             getEditorValue: getEditorValue,
-            handleDownloadStart: handleDownloadStart,
-            handleDownloadSuccess: handleDownloadSuccess
+            handleUpload: handleUpload
         });
 
         // initialise
@@ -19429,7 +19438,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
             this.addSubview(this.sidebar);
 
-            this.listenTo(Ghost.router, "route:settings", this.changePane);
+            this.listenTo(Ghost.router, 'route:settings', this.changePane);
         },
 
         changePane: function (pane) {
@@ -19566,7 +19575,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
         },
 
         saveSettings: function () {
-            var title = this.$('#blog-title').val(),
+            var self = this,
+                title = this.$('#blog-title').val(),
                 description = this.$('#blog-description').val(),
                 email = this.$('#email-address').val(),
                 postsPerPage = this.$('#postsPerPage').val();
@@ -19597,7 +19607,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }, {
                     success: this.saveSuccess,
                     error: this.saveError
-                });
+                }).then(function () { self.render(); });
             }
         },
         showLogo: function (e) {
@@ -19623,8 +19633,10 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     self.model.save(data, {
                         success: self.saveSuccess,
                         error: self.saveError
+                    }).then(function () {
+                        self.render();
                     });
-                    self.render();
+
                     return true;
                 },
                 buttonClass: "button-save right",
@@ -19679,8 +19691,9 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                     self.model.save(data, {
                         success: self.saveSuccess,
                         error: self.saveError
+                    }).then(function () {
+                        self.render();
                     });
-                    self.render();
                     return true;
                 },
                 buttonClass: "button-save right",
@@ -19694,7 +19707,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 
 
         saveUser: function () {
-            var userName = this.$('#user-name').val(),
+            var self = this,
+                userName = this.$('#user-name').val(),
                 userEmail = this.$('#user-email').val(),
                 userLocation = this.$('#user-location').val(),
                 userWebsite = this.$('#user-website').val(),
@@ -19733,6 +19747,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                 }, {
                     success: this.saveSuccess,
                     error: this.saveError
+                }).then(function () {
+                    self.render();
                 });
             }
         },
@@ -19776,6 +19792,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
                             status: 'passive'
                         });
                     }
+                }).then(function () {
+                    self.render();
                 });
             }
         },
