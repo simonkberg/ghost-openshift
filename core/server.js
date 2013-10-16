@@ -4,6 +4,7 @@ var express     = require('express'),
     _           = require('underscore'),
     colors      = require('colors'),
     semver      = require('semver'),
+    fs          = require('fs'),
     slashes     = require('connect-slashes'),
     errors      = require('./server/errorHandling'),
     admin       = require('./server/controllers/admin'),
@@ -13,6 +14,7 @@ var express     = require('express'),
     hbs         = require('express-hbs'),
     Ghost       = require('./ghost'),
     helpers     = require('./server/helpers'),
+    middleware  = require('./server/middleware'),
     packageInfo = require('../package.json'),
 
 // Variables
@@ -186,7 +188,7 @@ function activateTheme() {
     server.set('activeTheme', ghost.settings('activeTheme'));
     server.enable(server.get('activeTheme'));
     if (stackLocation) {
-        server.stack[stackLocation].handle = whenEnabled(server.get('activeTheme'), express['static'](ghost.paths().activeTheme));
+        server.stack[stackLocation].handle = whenEnabled(server.get('activeTheme'), middleware.staticTheme(ghost));
     }
 }
 
@@ -258,7 +260,7 @@ when(ghost.init()).then(function () {
     server.use('/ghost', whenEnabled('admin', express['static'](path.join(__dirname, '/client/assets'))));
 
     // Theme only config
-    server.use(whenEnabled(server.get('activeTheme'), express['static'](ghost.paths().activeTheme)));
+    server.use(whenEnabled(server.get('activeTheme'), middleware.staticTheme(ghost)));
 
     // Add in all trailing slashes
     server.use(slashes());
@@ -360,68 +362,87 @@ when(ghost.init()).then(function () {
     server.get('/:slug/', frontend.single);
     server.get('/', frontend.homepage);
 
+    // Are we using sockets? Custom socket or the default?
+    function getSocket() {
+        if (ghost.config().server.hasOwnProperty('socket')) {
+            return _.isString(ghost.config().server.socket) ? ghost.config().server.socket : path.join(__dirname, '../content/', process.env.NODE_ENV + '.socket');
+        }
+        return false;
+    }
 
+    function startGhost() {
+        // Tell users if their node version is not supported, and exit
+        if (!semver.satisfies(process.versions.node, packageInfo.engines.node)) {
+            console.log(
+                "\nERROR: Unsupported version of Node".red,
+                "\nGhost needs Node version".red,
+                packageInfo.engines.node.yellow,
+                "you are using version".red,
+                process.versions.node.yellow,
+                "\nPlease go to http://nodejs.org to get the latest version".green
+            );
+
+            process.exit(0);
+        }
+
+        // Startup & Shutdown messages
+        if (process.env.NODE_ENV === 'production') {
+            console.log(
+                "Ghost is running...".green,
+                "\nYour blog is now available on",
+                ghost.config().url,
+                "\nCtrl+C to shut down".grey
+            );
+
+            // ensure that Ghost exits correctly on Ctrl+C
+            process.on('SIGINT', function () {
+                console.log(
+                    "\nGhost has shut down".red,
+                    "\nYour blog is now offline"
+                );
+                process.exit(0);
+            });
+        } else {
+            console.log(
+                "Ghost is running...".green,
+                "\nListening on",
+                getSocket() || ghost.config().server.host + ':' + ghost.config().server.port,
+                "\nUrl configured as:",
+                ghost.config().url,
+                "\nCtrl+C to shut down".grey
+            );
+            // ensure that Ghost exits correctly on Ctrl+C
+            process.on('SIGINT', function () {
+                console.log(
+                    "\nGhost has shutdown".red,
+                    "\nGhost was running for",
+                    Math.round(process.uptime()),
+                    "seconds"
+                );
+                process.exit(0);
+            });
+        }
+
+        // Let everyone know we have finished loading
+        loading.resolve();
+    }
 
     // ## Start Ghost App
-    server.listen(
-        ghost.config().server.port,
-        ghost.config().server.host,
-        function () {
+    if (getSocket()) {
+        // Make sure the socket is gone before trying to create another
+        fs.unlink(getSocket(), function (err) {
+            server.listen(
+                getSocket(),
+                startGhost
+            );
+            fs.chmod(getSocket(), '0744');
+        });
 
-            // Tell users if their node version is not supported, and exit
-            if (!semver.satisfies(process.versions.node, packageInfo.engines.node)) {
-                console.log(
-                    "\nERROR: Unsupported version of Node".red,
-                    "\nGhost needs Node version".red,
-                    packageInfo.engines.node.yellow,
-                    "you are using version".red,
-                    process.versions.node.yellow,
-                    "\nPlease go to http://nodejs.org to get the latest version".green
-                );
-
-                process.exit(0);
-            }
-
-            // Startup & Shutdown messages
-            if (process.env.NODE_ENV === 'production') {
-                console.log(
-                    "Ghost is running...".green,
-                    "\nYour blog is now available on",
-                    ghost.config().url,
-                    "\nCtrl+C to shut down".grey
-                );
-
-                // ensure that Ghost exits correctly on Ctrl+C
-                process.on('SIGINT', function () {
-                    console.log(
-                        "\nGhost has shut down".red,
-                        "\nYour blog is now offline"
-                    );
-                    process.exit(0);
-                });
-            } else {
-                console.log(
-                    "Ghost is running...".green,
-                    "\nListening on",
-                    ghost.config().server.host + ':' + ghost.config().server.port,
-                    "\nUrl configured as:",
-                    ghost.config().url,
-                    "\nCtrl+C to shut down".grey
-                );
-                // ensure that Ghost exits correctly on Ctrl+C
-                process.on('SIGINT', function () {
-                    console.log(
-                        "\nGhost has shutdown".red,
-                        "\nGhost was running for",
-                        Math.round(process.uptime()),
-                        "seconds"
-                    );
-                    process.exit(0);
-                });
-            }
-
-            // Let everyone know we have finished loading
-            loading.resolve();
-        }
-    );
+    } else {
+        server.listen(
+            ghost.config().server.port,
+            ghost.config().server.host,
+            startGhost
+        );
+    }
 }, errors.logAndThrowError);

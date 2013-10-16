@@ -1187,6 +1187,8 @@
             this.$('#entry-title').val(this.model.get('title')).focus();
             this.$('#entry-markdown').text(this.model.get('markdown'));
 
+            this.listenTo(this.model, 'change:title', this.renderTitle);
+
             this.initMarkdown();
             this.renderPreview();
 
@@ -1267,6 +1269,10 @@
             }
         },
 
+        renderTitle: function () {
+            this.$('#entry-title').val(this.model.get('title'));
+        },
+
         // This is a hack to remove iOS6 white space on orientation change bug
         // See: http://cl.ly/RGx9
         orientationChange: function () {
@@ -1338,10 +1344,9 @@
         initUploads: function () {
             this.$('.js-drop-zone').upload({editor: true});
             this.$('.js-drop-zone').on('uploadstart', $.proxy(this.disableEditor, this));
-            this.$('.js-drop-zone').on('uploadstart', this.uploadMgr.handleDownloadStart);
             this.$('.js-drop-zone').on('uploadfailure', $.proxy(this.enableEditor, this));
             this.$('.js-drop-zone').on('uploadsuccess', $.proxy(this.enableEditor, this));
-            this.$('.js-drop-zone').on('uploadsuccess', this.uploadMgr.handleDownloadSuccess);
+            this.$('.js-drop-zone').on('uploadsuccess', this.uploadMgr.handleUpload);
         },
 
         enableEditor: function () {
@@ -1506,7 +1511,7 @@
             // TODO: hasMarker but no image?
         }
 
-        function handleDownloadStart(e) {
+        function handleUpload(e, result_src) {
             /*jslint regexp: true, bitwise: true */
             var line = findLine($(e.currentTarget).attr('id')),
                 lineNumber = editor.getLineNumber(line),
@@ -1531,9 +1536,6 @@
                     );
                 }
             }
-        }
-
-        function handleDownloadSuccess(e, result_src) {
             editor.replaceSelection(result_src);
         }
 
@@ -1550,8 +1552,7 @@
         // Public API
         _.extend(this, {
             getEditorValue: getEditorValue,
-            handleDownloadStart: handleDownloadStart,
-            handleDownloadSuccess: handleDownloadSuccess
+            handleUpload: handleUpload
         });
 
         // initialise
@@ -1942,7 +1943,7 @@
 
             this.addSubview(this.sidebar);
 
-            this.listenTo(Ghost.router, "route:settings", this.changePane);
+            this.listenTo(Ghost.router, 'route:settings', this.changePane);
         },
 
         changePane: function (pane) {
@@ -2079,7 +2080,8 @@
         },
 
         saveSettings: function () {
-            var title = this.$('#blog-title').val(),
+            var self = this,
+                title = this.$('#blog-title').val(),
                 description = this.$('#blog-description').val(),
                 email = this.$('#email-address').val(),
                 postsPerPage = this.$('#postsPerPage').val();
@@ -2110,7 +2112,7 @@
                 }, {
                     success: this.saveSuccess,
                     error: this.saveError
-                });
+                }).then(function () { self.render(); });
             }
         },
         showLogo: function (e) {
@@ -2136,8 +2138,10 @@
                     self.model.save(data, {
                         success: self.saveSuccess,
                         error: self.saveError
+                    }).then(function () {
+                        self.render();
                     });
-                    self.render();
+
                     return true;
                 },
                 buttonClass: "button-save right",
@@ -2192,8 +2196,9 @@
                     self.model.save(data, {
                         success: self.saveSuccess,
                         error: self.saveError
+                    }).then(function () {
+                        self.render();
                     });
-                    self.render();
                     return true;
                 },
                 buttonClass: "button-save right",
@@ -2207,7 +2212,8 @@
 
 
         saveUser: function () {
-            var userName = this.$('#user-name').val(),
+            var self = this,
+                userName = this.$('#user-name').val(),
                 userEmail = this.$('#user-email').val(),
                 userLocation = this.$('#user-location').val(),
                 userWebsite = this.$('#user-website').val(),
@@ -2246,6 +2252,8 @@
                 }, {
                     success: this.saveSuccess,
                     error: this.saveError
+                }).then(function () {
+                    self.render();
                 });
             }
         },
@@ -2289,6 +2297,8 @@
                             status: 'passive'
                         });
                     }
+                }).then(function () {
+                    self.render();
                 });
             }
         },

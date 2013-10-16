@@ -44,8 +44,8 @@ function program5(depth0,data) {
   buffer += "\" href=\"#\">\n    <h3 class=\"entry-title\">";
   if (stack1 = helpers.title) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.title; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
-  buffer += escapeExpression(stack1)
-    + "</h3>\n    <section class=\"entry-meta\">\n        <time datetime=\"2013-01-04\" class=\"date\">\n            ";
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "</h3>\n    <section class=\"entry-meta\">\n        <time datetime=\"2013-01-04\" class=\"date\">\n            ";
   stack1 = helpers['if'].call(depth0, depth0.published, {hash:{},inverse:self.program(5, program5, data),fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n        </time>\n        "

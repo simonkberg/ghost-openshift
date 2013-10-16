@@ -3,7 +3,7 @@ this["JST"] = this["JST"] || {};
 this["JST"]["forgotten"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  
+
 
 
   return "<form id=\"forgotten\" method=\"post\" novalidate=\"novalidate\">\n    <div class=\"email-wrap\">\n        <input class=\"email\" type=\"email\" placeholder=\"Email Address\" name=\"email\" autocapitalize=\"off\" autocorrect=\"off\">\n    </div>\n    <button class=\"button-save\" type=\"submit\">Send new password</button>\n</form>\n";
@@ -15,13 +15,13 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression, self=this, functionType="function";
 
 function program1(depth0,data) {
-  
-  
+
+
   return " featured";
   }
 
 function program3(depth0,data) {
-  
+
   var buffer = "", stack1, options;
   buffer += "\n                Published ";
   options = {hash:{
@@ -33,8 +33,8 @@ function program3(depth0,data) {
   }
 
 function program5(depth0,data) {
-  
-  
+
+
   return "\n                <span class=\"status-draft\">Draft</span>\n            ";
   }
 
@@ -44,8 +44,8 @@ function program5(depth0,data) {
   buffer += "\" href=\"#\">\n    <h3 class=\"entry-title\">";
   if (stack1 = helpers.title) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.title; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
-  buffer += escapeExpression(stack1)
-    + "</h3>\n    <section class=\"entry-meta\">\n        <time datetime=\"2013-01-04\" class=\"date\">\n            ";
+  if(stack1 || stack1 === 0) { buffer += stack1; }
+  buffer += "</h3>\n    <section class=\"entry-meta\">\n        <time datetime=\"2013-01-04\" class=\"date\">\n            ";
   stack1 = helpers['if'].call(depth0, depth0.published, {hash:{},inverse:self.program(5, program5, data),fn:self.program(3, program3, data),data:data});
   if(stack1 || stack1 === 0) { buffer += stack1; }
   buffer += "\n        </time>\n        "
@@ -70,7 +70,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, stack2, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "-"
     + escapeExpression(((stack1 = ((stack1 = depth0.options),stack1 == null || stack1 === false ? stack1 : stack1.type)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
@@ -78,14 +78,14 @@ function program1(depth0,data) {
   }
 
 function program3(depth0,data) {
-  
+
   var stack1, stack2;
   stack2 = helpers.each.call(depth0, ((stack1 = depth0.options),stack1 == null || stack1 === false ? stack1 : stack1.style), {hash:{},inverse:self.noop,fn:self.program(4, program4, data),data:data});
   if(stack2 || stack2 === 0) { return stack2; }
   else { return ''; }
   }
 function program4(depth0,data) {
-  
+
   var buffer = "";
   buffer += "modal-style-"
     + escapeExpression((typeof depth0 === functionType ? depth0.apply(depth0) : depth0))
@@ -94,7 +94,7 @@ function program4(depth0,data) {
   }
 
 function program6(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "<header class=\"modal-header\"><h1>"
     + escapeExpression(((stack1 = ((stack1 = depth0.content),stack1 == null || stack1 === false ? stack1 : stack1.title)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1))
@@ -103,13 +103,13 @@ function program6(depth0,data) {
   }
 
 function program8(depth0,data) {
-  
-  
+
+
   return "<a class=\"close\" href=\"#\"><span class=\"hidden\">Close</span></a>";
   }
 
 function program10(depth0,data) {
-  
+
   var buffer = "", stack1, stack2;
   buffer += "\n        <footer class=\"modal-footer\">\n            <button class=\"js-button-accept ";
   stack2 = helpers['if'].call(depth0, ((stack1 = ((stack1 = ((stack1 = depth0.options),stack1 == null || stack1 === false ? stack1 : stack1.confirm)),stack1 == null || stack1 === false ? stack1 : stack1.accept)),stack1 == null || stack1 === false ? stack1 : stack1.buttonClass), {hash:{},inverse:self.program(13, program13, data),fn:self.program(11, program11, data),data:data});
@@ -125,26 +125,26 @@ function program10(depth0,data) {
   return buffer;
   }
 function program11(depth0,data) {
-  
+
   var stack1;
   return escapeExpression(((stack1 = ((stack1 = ((stack1 = ((stack1 = depth0.options),stack1 == null || stack1 === false ? stack1 : stack1.confirm)),stack1 == null || stack1 === false ? stack1 : stack1.accept)),stack1 == null || stack1 === false ? stack1 : stack1.buttonClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
   }
 
 function program13(depth0,data) {
-  
-  
+
+
   return "button-add";
   }
 
 function program15(depth0,data) {
-  
+
   var stack1;
   return escapeExpression(((stack1 = ((stack1 = ((stack1 = ((stack1 = depth0.options),stack1 == null || stack1 === false ? stack1 : stack1.confirm)),stack1 == null || stack1 === false ? stack1 : stack1.reject)),stack1 == null || stack1 === false ? stack1 : stack1.buttonClass)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
   }
 
 function program17(depth0,data) {
-  
-  
+
+
   return "button-delete";
   }
 
@@ -180,7 +180,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 this["JST"]["modals/copyToHTML"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  
+
 
 
   return "Press Ctrl / Cmd + C to copy the following HTML.\n<pre>\n<code class=\"modal-copyToHTML-content\"></code>\n</pre>";
@@ -189,7 +189,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
 this["JST"]["modals/markdown"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  
+
 
 
   return "<section class=\"markdown-help-container\">\n    <table class=\"modal-markdown-help-table\">\n        <thead>\n            <tr>\n                <th>Result</th>\n                <th>Markdown</th>\n                <th>Shortcut</th>\n            </tr>\n        </thead>\n        <tbody>\n            <tr>\n                <td><strong>Bold</strong></td>\n                <td>**text**</td>\n                <td>Ctrl / Cmd + B</td>\n            </tr>\n            <tr>\n                <td><em>Emphasize</em></td>\n                <td>__text__</td>\n                <td>Ctrl / Cmd + I</td>\n            </tr>\n            <tr>\n                <td><code>Inline Code</code></td>\n                <td>`code`</td>\n                <td>Cmd + K / Ctrl + Shift + K</td>\n            </tr>\n            <tr>\n                <td>Strike-through</td>\n                <td>~~text~~</td>\n                <td>Ctrl + Alt + U</td>\n            </tr>\n            <tr>\n                <td><a href=\"#\">Link</a></td>\n                <td>[title](http://)</td>\n                <td>Ctrl + Shift + L</td>\n            </tr>\n            <tr>\n                <td>Image</td>\n                <td>![alt](http://)</td>\n                <td>Ctrl + Shift + I</td>\n            </tr>\n            <tr>\n                <td>List</td>\n                <td>* item</td>\n                <td>Ctrl + L</td>\n            </tr>\n            <tr>\n                <td>Blockquote</td>\n                <td>> quote</td>\n                <td>Ctrl + Q</td>\n            </tr>\n            <tr>\n                <td>H1</td>\n                <td># Heading</td>\n                <td>Ctrl + Alt + 1</td>\n            </tr>\n            <tr>\n                <td>H2</td>\n                <td>## Heading</td>\n                <td>Ctrl + Alt + 2</td>\n            </tr>\n            <tr>\n                <td>H3</td>\n                <td>### Heading</td>\n                <td>Ctrl + Alt + 3</td>\n            </tr>\n            <tr>\n                <td>H4</td>\n                <td>#### Heading</td>\n                <td>Ctrl + Alt + 4</td>\n            </tr>\n            <tr>\n                <td>H5</td>\n                <td>##### Heading</td>\n                <td>Ctrl + Alt + 5</td>\n            </tr>\n            <tr>\n                <td>H6</td>\n                <td>###### Heading</td>\n                <td>Ctrl + Alt + 6</td>\n            </tr>\n            <tr>\n                <td>Select Word</td>\n                <td></td>\n                <td>Ctrl + Alt + W</td>\n            </tr>\n            <tr>\n                <td>Uppercase</td>\n                <td></td>\n                <td>Ctrl + U</td>\n            </tr>\n            <tr>\n                <td>Lowercase</td>\n                <td></td>\n                <td>Ctrl + Shift + U</td>\n            </tr>\n            <tr>\n                <td>Titlecase</td>\n                <td></td>\n                <td>Ctrl + Alt + Shift + U</td>\n            </tr>\n            <tr>\n                <td>Insert Current Date</td>\n                <td></td>\n                <td>Ctrl + Shift + 1</td>\n            </tr>\n        </tbody>\n    </table>\n    For further Markdown syntax reference: <a href=\"http://daringfireball.net/projects/markdown/syntax\" target=\"_blank\">Markdown Documentation</a>\n</section>";
@@ -201,8 +201,8 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, stack2, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
-  
-  
+
+
   return " style=\"display: none\"";
   }
 
@@ -221,7 +221,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "-";
   if (stack1 = helpers.type) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -251,37 +251,37 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, stack2, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
-  
-  
+
+
   return "featured";
   }
 
 function program3(depth0,data) {
-  
-  
+
+
   return "unfeatured";
   }
 
 function program5(depth0,data) {
-  
-  
+
+
   return "Published";
   }
 
 function program7(depth0,data) {
-  
-  
+
+
   return "Written";
   }
 
 function program9(depth0,data) {
-  
+
   var stack1;
   return escapeExpression(((stack1 = ((stack1 = depth0.author),stack1 == null || stack1 === false ? stack1 : stack1.name)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
   }
 
 function program11(depth0,data) {
-  
+
   var stack1;
   return escapeExpression(((stack1 = ((stack1 = depth0.author),stack1 == null || stack1 === false ? stack1 : stack1.email)),typeof stack1 === functionType ? stack1.apply(depth0) : stack1));
   }
@@ -318,7 +318,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n                    <a class=\"js-modal-logo\" href=\"#\"><img id=\"blog-logo\" src=\"";
   if (stack1 = helpers.logo) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -329,13 +329,13 @@ function program1(depth0,data) {
   }
 
 function program3(depth0,data) {
-  
-  
+
+
   return "\n                    <a class=\"button-add js-modal-logo\" >Upload Image</a>\n                ";
   }
 
 function program5(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n                    <a class=\"js-modal-cover\" href=\"#\"><img id=\"blog-cover\" src=\"";
   if (stack1 = helpers.cover) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -346,13 +346,13 @@ function program5(depth0,data) {
   }
 
 function program7(depth0,data) {
-  
-  
+
+
   return "\n                    <a class=\"button-add js-modal-cover\">Upload Image</a>\n                ";
   }
 
 function program9(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "\n                        <option value=\"";
   if (stack1 = helpers.name) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -369,8 +369,8 @@ function program9(depth0,data) {
   return buffer;
   }
 function program10(depth0,data) {
-  
-  
+
+
   return "selected";
   }
 
@@ -406,7 +406,7 @@ function program10(depth0,data) {
 this["JST"]["settings/sidebar"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  
+
 
 
   return "<header>\n    <h1 class=\"title\">Settings</h1>\n</header>\n<nav class=\"settings-menu\">\n    <ul>\n        <li class=\"general\"><a href=\"#general\">General</a></li>\n        <li class=\"users\"><a href=\"#user\">User</a></li>\n    </ul>\n</nav>";
@@ -418,7 +418,7 @@ helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
   var buffer = "", stack1, functionType="function", escapeExpression=this.escapeExpression, self=this;
 
 function program1(depth0,data) {
-  
+
   var stack1;
   if (stack1 = helpers.cover) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
   else { stack1 = depth0.cover; stack1 = typeof stack1 === functionType ? stack1.apply(depth0) : stack1; }
@@ -426,13 +426,13 @@ function program1(depth0,data) {
   }
 
 function program3(depth0,data) {
-  
-  
+
+
   return "/shared/img/user-cover.png";
   }
 
 function program5(depth0,data) {
-  
+
   var buffer = "", stack1;
   buffer += "style=\"background-image: url(";
   if (stack1 = helpers.image) { stack1 = stack1.call(depth0, {hash:{},data:data}); }
@@ -483,7 +483,7 @@ function program5(depth0,data) {
 this["JST"]["signup"] = Handlebars.template(function (Handlebars,depth0,helpers,partials,data) {
   this.compilerInfo = [4,'>= 1.0.0'];
 helpers = this.merge(helpers, Handlebars.helpers); data = data || {};
-  
+
 
 
   return "<form id=\"signup\" method=\"post\" novalidate=\"novalidate\">\n    <div class=\"name-wrap\">\n        <input class=\"name\" type=\"text\" placeholder=\"Full Name\" name=\"name\" autocorrect=\"off\" />\n    </div>\n    <div class=\"email-wrap\">\n        <input class=\"email\" type=\"email\" placeholder=\"Email Address\" name=\"email\" autocapitalize=\"off\" autocorrect=\"off\" />\n    </div>\n    <div class=\"password-wrap\">\n        <input class=\"password\" type=\"password\" placeholder=\"Password\" name=\"password\" />\n    </div>\n    <button class=\"button-save\" type=\"submit\">Sign Up</button>\n</form>\n";

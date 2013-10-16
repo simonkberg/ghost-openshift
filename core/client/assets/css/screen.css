@@ -21,7 +21,7 @@
  *
  */
 /* =============================================================================
-   Bourbon 
+   Bourbon
    ============================================================================= */
 /* =============================================================================
    Breakpoint
@@ -454,7 +454,7 @@ table {
  * They are embedded via a custom icon font built with http://icomoon.io
  *
  * Table of Contents:
- * 
+ *
  * Font Face
  * Icon Element
  * Icon Variables / Short Names
@@ -481,7 +481,7 @@ table {
 /* =============================================================================
    Icon Variables / Short Names
    ============================================================================= */
-/* 
+/*
  * For accessibility, icon characters in the icon font are stored in Unicode's
  * Private Use Area characters. This means that screen readers won't attempt to
  * read them out loud. For code maintainability, we then store these Unicode
@@ -489,7 +489,7 @@ table {
  */
 /* =============================================================================
    Usage
-   ============================================================================= 
+   =============================================================================
 
 To create a button with a label that is prefixed with a camera icon, we might
 write our Sass something like this:
@@ -529,7 +529,7 @@ Thi would then output full CSS something like this:
  * Specific styles for re-usable animations in Ghost admin.
  *
  * Table of Contents:
- * 
+ *
  *
  */
 /* =============================================================================
@@ -937,7 +937,8 @@ nav li {
     speak: none;
     line-height: 1;
     -webkit-font-smoothing: antialiased;
-    content: "\e000"; }
+    content: "\e000";
+    line-height: 0; }
   .ghost-logo:hover {
     text-decoration: none; }
   .ghost-logo:hover {
@@ -1673,20 +1674,6 @@ nav li {
   background: rgba(0, 0, 0, 0.4);
   z-index: 1030; }
 
-body.blur > *:not(#modal-container) {
-  -webkit-transition: all 0.15s linear 0s;
-  -moz-transition: all 0.15s linear 0s;
-  transition: all 0.15s linear 0s;
-  -webkit-filter: blur(2px);
-  -moz-filter: blur(2px);
-  -ms-filter: blur(2px);
-  -o-filter: blur(2px);
-  -webkit-transform: translateZ(0);
-  -moz-transform: translateZ(0);
-  -ms-transform: translateZ(0);
-  -o-transform: translateZ(0);
-  transform: translateZ(0); }
-
 .modal-info, .modal-action, .modal {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
@@ -1710,20 +1697,24 @@ body.blur > *:not(#modal-container) {
     .modal-info, .modal-action, .modal {
       width: 100%;
       margin-left: 0; } }
+  .modal-info .image-uploader, .modal-action .image-uploader,
+  .modal-info .pre-image-uploader,
+  .modal-action .pre-image-uploader, .modal .image-uploader,
+  .modal .pre-image-uploader {
+    margin: 0; }
 
 .modal-action {
   padding: 60px 0 30px; }
   @media (max-width: 800px), (max-width: 800px) {
     .modal-action {
       padding: 30px 0; } }
-  .modal-action .modal-footer {
-    margin-top: 20px; }
 
 .modal-content {
   -webkit-box-sizing: padding-box;
   -moz-box-sizing: padding-box;
   box-sizing: padding-box;
   position: relative;
+  padding: 20px;
   background-clip: padding-box;
   background-color: #FFFFFF;
   border-radius: 2px;
@@ -1774,12 +1765,10 @@ body.blur > *:not(#modal-container) {
 .modal-body {
   position: relative;
   min-height: 100px;
-  padding: 0 20px;
   overflow-y: auto; }
 
 .modal-footer {
-  padding: 20px;
-  padding-top: 0; }
+  margin-top: 20px; }
 
 .modal-style-wide {
   width: 550px; }
@@ -1895,6 +1884,9 @@ main {
     text-decoration: none; }
     .image-uploader a:hover {
       color: #242628; }
+  .image-uploader .description {
+    margin-top: 10px;
+    margin-bottom: -40px; }
   .image-uploader .centre {
     position: relative;
     top: 50px;
@@ -1970,12 +1962,11 @@ main {
       text-decoration: none; }
   .image-uploader .image-cancel {
     position: absolute;
+    color: white;
+    text-shadow: rgba(0, 0, 0, 0.3) 0 0 3px;
     top: 10px;
     right: 10px;
-    padding: 8px;
-    color: #aaa9a2;
-    text-decoration: none;
-    line-height: 0; }
+    text-decoration: none; }
     .image-uploader .image-cancel:before {
       font-family: "Icons";
       font-weight: normal;
@@ -1986,11 +1977,12 @@ main {
       line-height: 1;
       -webkit-font-smoothing: antialiased;
       content: "\e034";
-      font-size: 14px; }
+      font-size: 16px; }
     .image-uploader .image-cancel:hover {
       text-decoration: none; }
     .image-uploader .image-cancel:hover {
-      cursor: pointer; }
+      cursor: pointer;
+      color: white; }
   .image-uploader input.main {
     position: absolute;
     right: 0;
@@ -2057,10 +2049,6 @@ main {
     background: #5ba4e5; }
     .image-uploader .bar.fail {
       background: #e25440; }
-
-.image-uploader-url .description {
-  margin-top: 10px;
-  margin-bottom: -40px; }
 
 .pre-image-uploader {
   -webkit-box-sizing: border-box;
@@ -3012,7 +3000,7 @@ input[type="reset"] {
  * These styles control elements specific to the post editor screen
  * used for publishing content with Ghost.
  *
- * Table of Contents: 
+ * Table of Contents:
  *
  * Editor / Preview
  * Post Preview Content
@@ -3891,7 +3879,7 @@ body.zen {
  * These styles control elements specific to the Ghost admin login / signup screens.
  *
  * Table of Contents:
- * 
+ *
  * 0. General
  * 1. Login
  * 2. Signup
